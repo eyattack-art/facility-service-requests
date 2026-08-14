@@ -1,5 +1,5 @@
 [project]
-name = "facility-service-requests-1"
+name = "facility-service-requests"
 version = "0.1.0"
 description = ""
 authors = [
@@ -7,14 +7,17 @@ authors = [
 ]
 requires-python = ">=3.13, <3.14"
 dependencies = [
-    "sqlalchemy (>=2.0.52,<3.0.0)",
     "fastapi (>=0.141.1,<0.142.0)",
     "uvicorn (>=0.52.1,<0.53.0)",
     "asyncpg (>=0.31.0,<0.32.0)",
     "pydantic (>=2.13.4,<3.0.0)",
-    "pydantic-settings (>=2.15.0,<3.0.0)"
+    "pydantic-settings (>=2.15.0,<3.0.0)",
+    "uuid-utils (>=0.17.0,<0.18.0)",
+    "datetime (>=6.0,<7.0)"
 ]
 
+[tool.poetry]
+packages = [{include = "app"}]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -28,3 +31,33 @@ dev = [
     "ruff (>=0.16.2,<0.17.0)",
     "mypy (>=2.3.0,<3.0.0)"
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort (сортировка импортов)
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear (частые баги)
+    "ASYNC", # проверки на async-код — полезно именно для твоего проекта
+]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+warn_return_any = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false

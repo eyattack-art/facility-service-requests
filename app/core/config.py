@@ -3,8 +3,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppConfig(BaseModel):
-    host: str = '127.0.0.1'
+    host: str = "127.0.0.1"
     port: int = 8080
+
 
 class DatabaseConfig(BaseModel):
     url: str
@@ -13,6 +14,7 @@ class DatabaseConfig(BaseModel):
     pool_pre_ping: bool = True
     pool_recycle: int = 1800
     pool_timeout: int = 30
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -24,5 +26,6 @@ class Settings(BaseSettings):
     )
     app: AppConfig = AppConfig()
     database: DatabaseConfig
+
 
 settings = Settings()
