@@ -20,7 +20,7 @@ class DatabaseManager:
             pool_timeout=pool_timeout,
         )
         self._session_factory = async_sessionmaker(
-            engine=self._engine,
+            bind=self._engine,
             expire_on_commit=False,
             autoflush=False,
         )

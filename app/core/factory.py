@@ -1,9 +1,11 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from starlette.responses import JSONResponse
 
 from app.core.config import Settings
+from app.core.exception import ForbiddenError, UnauthorizedError
 from app.infrastructure.database.database_manager import DatabaseManager
 
 
@@ -24,4 +26,19 @@ def create_app(settings: Settings) -> FastAPI:
 
     fastapi_app = FastAPI(lifespan=lifespan, title="Facility requests API")
 
+    _exception_handler(fastapi_app)
+
     return fastapi_app
+
+
+def _exception_handler(app: FastAPI) -> None:
+
+    @app.exception_handler(UnauthorizedError)
+    async def unauthorized_exception_handler(
+        request: Request, exc: UnauthorizedError
+    ) -> JSONResponse:
+        return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+    @app.exception_handler(ForbiddenError)
+    async def forbidden_exception_handler(request: Request, exc: UnauthorizedError) -> JSONResponse:
+        return JSONResponse(status_code=403, content={"detail": str(exc)})

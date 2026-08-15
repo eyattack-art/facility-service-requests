@@ -50,7 +50,9 @@ class ServiceRequest(UUIDMixin, TimeMixin, Base):
     category: Mapped[RequestCategory] = mapped_column(String(20), nullable=False)
     priority: Mapped[RequestPriority] = mapped_column(String(20), nullable=False)
     status: Mapped[RequestStatus] = mapped_column(String(20), nullable=False)
-    assignee_id: Mapped[UUID | None] = mapped_column(ForeignKey("users.id", ondelete="RESTRICT"), nullable=True)
+    assignee_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="RESTRICT"), nullable=True
+    )
     result: Mapped[str | None] = mapped_column(Text, nullable=True)
     cancellation_reason: Mapped[str] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
