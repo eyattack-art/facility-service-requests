@@ -12,7 +12,8 @@ from app.models.user import UserRole
 
 
 async def get_session(request: Request) -> AsyncGenerator[AsyncSession]:
-    async with request.app.state.database_manager.get_session_factory() as session:
+    session_factory = request.app.state.database_manager.get_session_factory()
+    async with session_factory() as session:
         yield session
 
 

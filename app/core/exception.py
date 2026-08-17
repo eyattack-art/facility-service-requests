@@ -1,5 +1,8 @@
 class AppError(Exception):
-    pass
+    def __init__(self, message: str, details: dict[str, str]) -> None:
+        super().__init__(message)
+        self.message = message
+        self.details = details
 
 
 class UnauthorizedError(AppError):

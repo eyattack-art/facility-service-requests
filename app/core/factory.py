@@ -8,6 +8,8 @@ from app.core.config import Settings
 from app.core.exception import ForbiddenError, UnauthorizedError
 from app.infrastructure.database.database_manager import DatabaseManager
 
+from app.api.health import router as health_router
+
 
 def create_app(settings: Settings) -> FastAPI:
 
@@ -26,9 +28,13 @@ def create_app(settings: Settings) -> FastAPI:
 
     fastapi_app = FastAPI(lifespan=lifespan, title="Facility requests API")
 
+    _setup_routers(fastapi_app)
     _exception_handler(fastapi_app)
 
     return fastapi_app
+
+def _setup_routers(app: FastAPI) -> None:
+    app.include_router(health_router)
 
 
 def _exception_handler(app: FastAPI) -> None:
