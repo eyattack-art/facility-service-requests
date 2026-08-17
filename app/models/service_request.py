@@ -68,7 +68,10 @@ class ServiceRequest(UUIDMixin, TimeMixin, Base):
     assignee: Mapped["User | None"] = relationship(
         back_populates="assigned_requests", foreign_keys=[assignee_id]
     )
-    history: Mapped[list["StatusHistory"]] = relationship(back_populates="request")
+    history: Mapped[list["StatusHistory"]] = relationship(
+        back_populates="request",
+        order_by="[StatusHistory.created_at, StatusHistory.id]",
+    )
 
     __table_args__ = (
         CheckConstraint(

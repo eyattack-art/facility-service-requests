@@ -4,11 +4,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from starlette.responses import JSONResponse
 
+from app.api.health import router as health_router
+from app.api.v1.requests import router as request_router
 from app.core.config import Settings
 from app.core.exception import ForbiddenError, UnauthorizedError
 from app.infrastructure.database.database_manager import DatabaseManager
-
-from app.api.health import router as health_router
 
 
 def create_app(settings: Settings) -> FastAPI:
@@ -33,8 +33,10 @@ def create_app(settings: Settings) -> FastAPI:
 
     return fastapi_app
 
+
 def _setup_routers(app: FastAPI) -> None:
     app.include_router(health_router)
+    app.include_router(request_router)
 
 
 def _exception_handler(app: FastAPI) -> None:

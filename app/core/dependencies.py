@@ -1,14 +1,16 @@
 import uuid
-from collections.abc import AsyncGenerator
-from typing import Annotated, Callable, Awaitable
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from typing import Annotated
 
 from fastapi import Depends, Header, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exception import ForbiddenError, UnauthorizedError
+from app.infrastructure.database.unit_of_work import UnitOfWork
 from app.models import User
 from app.models.user import UserRole
+from app.services.service_request_service import ServiceRequestService
 
 
 async def get_session(request: Request) -> AsyncGenerator[AsyncSession]:
@@ -18,6 +20,14 @@ async def get_session(request: Request) -> AsyncGenerator[AsyncSession]:
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
+
+
+def get_unit_of_work(request: Request) -> UnitOfWork:
+    session_factory = request.app.state.database_manager.get_session_factory()
+    return UnitOfWork(session_factory=session_factory)
+
+
+UnitOfWorkDep = Annotated[UnitOfWork, Depends(get_unit_of_work)]
 
 
 async def get_current_user(
@@ -54,3 +64,10 @@ def require_role(*allowed_roles: UserRole) -> Callable[[CurrentUser], Awaitable[
         return user
 
     return _check_role
+
+
+def get_request_service(uow: UnitOfWorkDep) -> ServiceRequestService:
+    return ServiceRequestService(uow)
+
+
+ServiceRequestServiceDep = Annotated[ServiceRequestService, Depends(get_request_service)]

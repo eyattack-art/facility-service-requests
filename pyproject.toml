@@ -13,7 +13,7 @@ dependencies = [
     "pydantic (>=2.13.4,<3.0.0)",
     "pydantic-settings (>=2.15.0,<3.0.0)",
     "uuid-utils (>=0.17.0,<0.18.0)",
-    "datetime (>=6.0,<7.0)"
+    "sqlalchemy (>=2.0.52,<3.0.0)"
 ]
 
 [tool.poetry]

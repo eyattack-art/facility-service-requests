@@ -46,8 +46,8 @@ def build_users() -> list[UserSeed]:
     for facility in FACILITIES:
         users.append(
             UserSeed(
-                key=f"f{facility.key}:employee:1",
-                name="Сотрудник объекта {facility.name}",
+                key=f"{facility.key}:employee:1",
+                name=f"Сотрудник объекта {facility.name}",
                 role=UserRole.EMPLOYEE.value,
                 facility_key=facility.key,
             )
@@ -93,6 +93,7 @@ async def seed(session: AsyncSession) -> None:
             .on_conflict_do_nothing(index_elements=["id"])
         )
         await session.execute(stmt)
+        print(f"Facility '{facility.name}': {facility_id}")
 
     for user in build_users():
         user_id = make_uuid(f"user:{user.key}")
@@ -110,6 +111,7 @@ async def seed(session: AsyncSession) -> None:
             .on_conflict_do_nothing(index_elements=["id"])
         )
         await session.execute(stmt)
+        print(f"User '{user.name}' ({user.role}): {user_id}")
 
     await session.commit()
 
