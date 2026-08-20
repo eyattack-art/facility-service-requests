@@ -58,3 +58,7 @@ def _exception_handler(app: FastAPI) -> None:
     @app.exception_handler(NotFoundError)
     async def not_found_exception_handler(request: Request, exc: NotFoundError) -> JSONResponse:
         return JSONResponse(status_code=404, content={"message": str(exc)})
+
+    @app.exception_handler(Exception)
+    async def exception_handler(request: Request, exc: Exception) -> JSONResponse:
+        return JSONResponse(status_code=500, content={"message": "Внутренняя ошибка сервера"})

@@ -3,7 +3,18 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, String, Text, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    String,
+    Text,
+    func,
+)
+from sqlalchemy import (
+    Enum as SAEnum,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -47,9 +58,36 @@ class ServiceRequest(UUIDMixin, TimeMixin, Base):
     )
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    category: Mapped[RequestCategory] = mapped_column(String(20), nullable=False)
-    priority: Mapped[RequestPriority] = mapped_column(String(20), nullable=False)
-    status: Mapped[RequestStatus] = mapped_column(String(20), nullable=False)
+    category: Mapped[RequestCategory] = mapped_column(
+        SAEnum(
+            RequestCategory,
+            name="category_enum",
+            native_enum=False,
+            length=20,
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+    )
+    priority: Mapped[RequestPriority] = mapped_column(
+        SAEnum(
+            RequestPriority,
+            name="priority_enum",
+            native_enum=False,
+            length=20,
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+    )
+    status: Mapped[RequestStatus] = mapped_column(
+        SAEnum(
+            RequestStatus,
+            name="status_enum",
+            native_enum=False,
+            length=20,
+            values_callable=lambda enum_cls: [e.value for e in enum_cls],
+        ),
+        nullable=False,
+    )
     assignee_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="RESTRICT"), nullable=True
     )

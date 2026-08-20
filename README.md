@@ -24,13 +24,19 @@ docker compose exec api poetry run python -m app.cli.seed
 
 ## 4. Открыть документацию API
 
-- Swagger: http://localhost:8000/docs
+Swagger: http://localhost:8080/docs
 
 ## Остановка
 
 ```bash
 docker compose down          # остановить
 docker compose down -v       # остановить и удалить данные
+```
+
+## Тесты
+
+```bash
+docker compose exec api poetry run pytest
 ```
 
 ## Проверки кода
