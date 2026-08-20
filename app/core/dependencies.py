@@ -2,14 +2,16 @@ import uuid
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from typing import Annotated
 
-from fastapi import Depends, Header, Request
+from fastapi import Depends, Header, Query, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exception import ForbiddenError, UnauthorizedError
 from app.infrastructure.database.unit_of_work import UnitOfWork
 from app.models import User
+from app.models.service_request import RequestCategory, RequestPriority, RequestStatus
 from app.models.user import UserRole
+from app.schemas.requests import RequestFiltersSchema
 from app.services.service_request_service import ServiceRequestService
 
 
@@ -64,6 +66,25 @@ def require_role(*allowed_roles: UserRole) -> Callable[[CurrentUser], Awaitable[
         return user
 
     return _check_role
+
+
+def get_request_filters(
+    status: Annotated[RequestStatus | None, Query()] = None,
+    category: Annotated[RequestCategory | None, Query()] = None,
+    priority: Annotated[RequestPriority | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=100)] = 20,
+    offset: Annotated[int, Query(ge=0)] = 0,
+) -> RequestFiltersSchema:
+    return RequestFiltersSchema(
+        status=status,
+        category=category,
+        priority=priority,
+        limit=limit,
+        offset=offset,
+    )
+
+
+RequestFiltersDep = Annotated[RequestFiltersSchema, Depends(get_request_filters)]
 
 
 def get_request_service(uow: UnitOfWorkDep) -> ServiceRequestService:

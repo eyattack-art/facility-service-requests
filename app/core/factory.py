@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 from app.api.health import router as health_router
 from app.api.v1.requests import router as request_router
 from app.core.config import Settings
-from app.core.exception import ForbiddenError, UnauthorizedError
+from app.core.exception import ConflictError, ForbiddenError, NotFoundError, UnauthorizedError
 from app.infrastructure.database.database_manager import DatabaseManager
 
 
@@ -45,8 +45,16 @@ def _exception_handler(app: FastAPI) -> None:
     async def unauthorized_exception_handler(
         request: Request, exc: UnauthorizedError
     ) -> JSONResponse:
-        return JSONResponse(status_code=401, content={"detail": str(exc)})
+        return JSONResponse(status_code=401, content={"message": str(exc)})
 
     @app.exception_handler(ForbiddenError)
     async def forbidden_exception_handler(request: Request, exc: UnauthorizedError) -> JSONResponse:
-        return JSONResponse(status_code=403, content={"detail": str(exc)})
+        return JSONResponse(status_code=403, content={"message": str(exc)})
+
+    @app.exception_handler(ConflictError)
+    async def conflict_exception_handler(request: Request, exc: ConflictError) -> JSONResponse:
+        return JSONResponse(status_code=409, content={"message": str(exc)})
+
+    @app.exception_handler(NotFoundError)
+    async def not_found_exception_handler(request: Request, exc: NotFoundError) -> JSONResponse:
+        return JSONResponse(status_code=404, content={"message": str(exc)})

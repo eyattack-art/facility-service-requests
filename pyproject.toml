@@ -29,12 +29,15 @@ dev = [
     "pytest-asyncio (>=1.4.0,<2.0.0)",
     "alembic (>=1.19.1,<2.0.0)",
     "ruff (>=0.16.2,<0.17.0)",
-    "mypy (>=2.3.0,<3.0.0)"
+    "mypy (>=2.3.0,<3.0.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "asgi-lifespan (>=2.1.0,<3.0.0)",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+extend-exclude = ["migration"]
 
 [tool.ruff.lint]
 select = [
@@ -61,3 +64,7 @@ warn_return_any = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
