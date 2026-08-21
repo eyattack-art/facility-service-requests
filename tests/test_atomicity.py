@@ -4,13 +4,13 @@ from collections.abc import Awaitable, Callable
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy import select, delete
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, AsyncEngine
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.core.exception import ConflictError
 from app.infrastructure.database.unit_of_work import UnitOfWork
 from app.models.facility import Facility
-from app.models.service_request import ServiceRequest, RequestStatus
+from app.models.service_request import RequestStatus, ServiceRequest
 from app.models.status_history import StatusHistory
 from app.models.user import User, UserRole
 from app.repositories.status_history_repository import StatusHistoryRepository
@@ -21,13 +21,13 @@ MakeServiceRequest = Callable[..., Awaitable[ServiceRequest]]
 
 
 async def test_assign_rolls_back_request_if_status_history_repository_fails(
-        client: AsyncClient,
-        facility: Facility,
-        employee_user: User,
-        manager_user: User,
-        technician_user: User,
-        make_service_request: MakeServiceRequest,
-        monkeypatch: pytest.MonkeyPatch,
+    client: AsyncClient,
+    facility: Facility,
+    employee_user: User,
+    manager_user: User,
+    technician_user: User,
+    make_service_request: MakeServiceRequest,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
     ТЗ: изменение заявки и запись истории должны выполняться атомарно.
@@ -41,8 +41,8 @@ async def test_assign_rolls_back_request_if_status_history_repository_fails(
     request_id = request.id
 
     async def _boom(
-            self: StatusHistoryRepository,
-            entry: StatusHistory,
+        self: StatusHistoryRepository,
+        entry: StatusHistory,
     ) -> StatusHistory:
         raise RuntimeError("Симулированный сбой репозитория истории")
 
@@ -73,10 +73,10 @@ async def test_assign_rolls_back_request_if_status_history_repository_fails(
 
 
 async def test_status_history_repository_works_with_postgresql_transaction(
-        db_session: AsyncSession,
-        facility: Facility,
-        employee_user: User,
-        make_service_request: MakeServiceRequest,
+    db_session: AsyncSession,
+    facility: Facility,
+    employee_user: User,
+    make_service_request: MakeServiceRequest,
 ) -> None:
     """
     ТЗ: история изменения статусов должна сохраняться в базе данных.
@@ -119,8 +119,8 @@ async def test_status_history_repository_works_with_postgresql_transaction(
 
 
 async def test_concurrent_assign_only_one_wins(
-        test_engine: AsyncEngine,
-        monkeypatch: pytest.MonkeyPatch,
+    test_engine: AsyncEngine,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
     ТЗ, раздел 11: "Вторая команда после получения блокировки обязана повторно
@@ -181,9 +181,7 @@ async def test_concurrent_assign_only_one_wins(
     try:
         original_add = StatusHistoryRepository.add
 
-        async def _slow_add(
-                self: StatusHistoryRepository, entry: StatusHistory
-        ) -> StatusHistory:
+        async def _slow_add(self: StatusHistoryRepository, entry: StatusHistory) -> StatusHistory:
             await asyncio.sleep(0.4)
             return await original_add(self, entry)
 
@@ -207,13 +205,13 @@ async def test_concurrent_assign_only_one_wins(
 
         successes = [r for r in results if isinstance(r, ServiceRequest)]
         conflicts = [r for r in results if isinstance(r, ConflictError)]
-        other_errors = [
-            r for r in results if not isinstance(r, ServiceRequest | ConflictError)
-        ]
+        other_errors = [r for r in results if not isinstance(r, ServiceRequest | ConflictError)]
 
         assert other_errors == [], f"Неожиданные ошибки: {other_errors}"
         assert len(successes) == 1, "Ровно одна из двух команд должна успешно назначить заявку"
-        assert len(conflicts) == 1, "Вторая команда должна получить конфликт (409), а не тихо победить"
+        assert len(conflicts) == 1, (
+            "Вторая команда должна получить конфликт (409), а не тихо победить"
+        )
 
         winner_technician_id = successes[0].assignee_id
         assert winner_technician_id in {technician_a_id, technician_b_id}

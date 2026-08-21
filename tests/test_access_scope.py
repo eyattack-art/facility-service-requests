@@ -156,6 +156,7 @@ async def test_technician_cannot_start_unassigned_request(
 
     assert response.status_code == 404
 
+
 async def test_technician_cannot_start_request_assigned_to_another_technician(
     client: AsyncClient,
     facility: Facility,
@@ -182,6 +183,7 @@ async def test_technician_cannot_start_request_assigned_to_another_technician(
     )
 
     assert response.status_code == 404
+
 
 async def test_technician_cannot_complete_request_assigned_to_another_technician(
     client: AsyncClient,
@@ -211,6 +213,7 @@ async def test_technician_cannot_complete_request_assigned_to_another_technician
 
     assert response.status_code == 404
 
+
 async def test_employee_cannot_cancel_other_employee_request_same_facility(
     client: AsyncClient,
     facility: Facility,
@@ -235,6 +238,7 @@ async def test_employee_cannot_cancel_other_employee_request_same_facility(
     )
 
     assert response.status_code == 404
+
 
 async def test_assign_rejects_unknown_technician(
     client: AsyncClient,
@@ -261,6 +265,7 @@ async def test_assign_rejects_unknown_technician(
 
     assert response.status_code in (404, 409)
 
+
 async def test_start_rejects_new_request(
     client: AsyncClient,
     facility: Facility,
@@ -285,6 +290,7 @@ async def test_start_rejects_new_request(
     )
 
     assert response.status_code == 404
+
 
 async def test_complete_rejects_new_request(
     client: AsyncClient,
@@ -311,6 +317,7 @@ async def test_complete_rejects_new_request(
     )
 
     assert response.status_code == 404
+
 
 async def test_cancel_adds_status_history(
     client: AsyncClient,

@@ -1,8 +1,13 @@
-# Хранение перечисляемых значений (role, status, category, priority)
+## Хранение перечисляемых значений (role, status, category, priority)
 
 Varchar + CHECK constraint вместо нативного Postgres ENUM. 
 В Python — enum.Enum для типизации и автодополнения, в БД — обычная строка с ограничением через CHECK.
 
-# UUID v7 вместо UUID v4
+На уровне SQLAlchemy колонки замаплены через Enum(..., native_enum=False, values_callable=...), а не через голый 
+String: без этого ORM после свежей загрузки строки из БД возвращает обычный str, а не Python-enum, и любой код вида 
+request.status.value падает с AttributeError на объектах, загруженных не в текущей транзакции. native_enum=False рендерит 
+в DDL тот же VARCHAR, что и раньше — миграция не требуется, меняется только поведение на Python-стороне.
+
+## UUID v7 вместо UUID v4
 UUID v7 сохраняет преимущества UUID, но дополнительно содержит timestamp. 
 Благодаря этому идентификаторы сортируются примерно в порядке создания, что улучшает работу индексов в БД и упрощает отладку.

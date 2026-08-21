@@ -53,6 +53,7 @@ async def test_create_request_success(
     assert history[0]["old_status"] is None
     assert history[0]["new_status"] == "new"
 
+
 async def test_create_request_rejected_for_inactive_facility(
     client: AsyncClient,
     employee_user: User,

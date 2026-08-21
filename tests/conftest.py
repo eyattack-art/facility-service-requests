@@ -1,6 +1,7 @@
 import os
 import subprocess
 from collections.abc import AsyncGenerator, Awaitable, Callable
+from types import TracebackType
 
 import pytest
 import pytest_asyncio
@@ -80,7 +81,12 @@ class TestUnitOfWork(UnitOfWork):
         self.status_history_repository = StatusHistoryRepository(self._session)
         return self
 
-    async def __aexit__(self, exc_type, exc, tb) -> None:
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         assert self._nested is not None
         if exc_type is not None:
             await self._nested.rollback()
@@ -214,7 +220,7 @@ async def other_employee_user(db_session: AsyncSession, other_facility: Facility
 
 
 @pytest_asyncio.fixture
-def make_service_request(
+async def make_service_request(
     db_session: AsyncSession,
 ) -> Callable[..., Awaitable[ServiceRequest]]:
     """Фабрика для создания заявки напрямую в БД, минуя сервисный слой.
